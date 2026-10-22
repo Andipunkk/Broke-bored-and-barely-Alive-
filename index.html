@@ -443,19 +443,24 @@
     .slide-handle { width: 54px; height: 54px; background: #66fcf1; color: #0b0c10; border-radius: 50%; position: absolute; top: 0; left: 0; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 22px; font-weight: bold; }
     .study-input { width: 100%; padding: 14px; font-size: 20px; border-radius: 12px; border: 2px solid #45a29e; background: #0b0c10; color: #66fcf1; text-align: center; font-family: 'Fredoka One', cursive; margin: 18px 0; outline: none; }
     .drag-area { display: flex; justify-content: space-around; align-items: center; margin: 20px 0; }
-    .snack-item { width: 70px; height: 70px; background: #fffa65; color: #000; border-radius: 16px; display: flex; justify-content: center; align-items: center; font-size: 30px; cursor: grab; }
-    .backpack-dropzone { width: 100px; height: 100px; border: 3px dashed #66fcf1; border-radius: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 13px; color: #66fcf1; font-weight: bold; }
+    /* La pizza queda como emoji suelto, sin fondo ni recuadro. */
+    .snack-item { display: inline-flex; justify-content: center; align-items: center; width: auto; height: auto; padding: 0; margin: 0; background: transparent; border: none; border-radius: 0; color: inherit; font-size: 38px; line-height: 1; cursor: grab; }
+    .snack-item:active { cursor: grabbing; }
+
+    /* Zona invisible para soltar la pizza; solo se ve la imagen de la mochila. */
+    .backpack-dropzone { width: 130px; height: 110px; padding: 0; margin: 0; border: none; border-radius: 0; background: transparent; display: flex; justify-content: center; align-items: center; font-size: 13px; color: transparent; font-weight: normal; }
   </style>
 </head>
 <body>
 
   <!-- ELEMENTOS DE AUDIO (REEMPLAZAR CON TUS ARCHIVOS MP3) -->
   <audio id="bg-music" loop>
-    <source src="audio/musica_fondo.mp3" type="audio/mpeg">
+    <source src="assets/CarrilloAndrea_ZatarainHelen_Broke-Bored & Barely Alive_BackgroundMusic1.mp3.mpeg" type="audio/mpeg">
   </audio>
+  <!-- Cambia WORK_MUSIC_SRC en el script por la ruta/nombre real de tu música de trabajo. -->
 
   <audio id="sfx-click">
-    <source src="audio/sonido_boton.mp3" type="audio/mpeg">
+    <source src="assets/CarrilloAndrea_ZatarainHelen_Broke-Bored & Barely Alive_ButtonSound1.mp3.mpeg" type="audio/mpeg">
   </audio>
 
   <div id="game-container">
@@ -579,19 +584,23 @@
       </div>
     </div>
 
-    <div id="modal-food" class="minigame-overlay">
-      <div class="minigame-card">
-        <h3>Hide Food</h3>
-        <p style="color:#c5c6c7; font-size:15px;">Drag your snack into your backpack before someone steals it!</p>
-        <div class="drag-area">
-          <div class="snack-item" id="drag-snack" draggable="true">🍕</div>
-          <div class="backpack-dropzone" id="drop-backpack">
-            <span style="font-size: 28px;">🎒</span>
-            <span>Backpack</span>
-          </div>
-        </div>
+<!-- MODAL HIDE FOOD (CON TU MOCHILA REAL) -->
+<div id="modal-food" class="minigame-overlay">
+  <div class="minigame-card">
+    <h3>Hide Food</h3>
+    <p style="color:#c5c6c7; font-size:15px;">Drag your snack into your backpack before someone steals it!</p>
+    <div class="drag-area">
+      <!-- TU COMIDA/SNACK PARA ARRASTRAR -->
+      <div class="snack-item" id="drag-snack" draggable="true">🍕</div>
+
+      <!-- ZONA DE LA MOCHILA CON TU IMAGEN REAL -->
+      <div class="backpack-dropzone" id="drop-backpack">
+        <!-- REEMPLAZA 'imagenes/mi_mochila_real.png' CON LA RUTA DE TU FOTO DE LA MOCHILA -->
+        <img src="assets/mochila xD.png" alt="My Backpack" id="backpack-img" style="width: 100%; height: 100%; object-fit: contain; pointer-events: none;">
       </div>
     </div>
+  </div>
+</div>
 
   </div>
 
@@ -628,6 +637,30 @@
       selectedCharacter: 'female',
       isGameOver: false
     };
+
+    const DEFAULT_MUSIC_SRC = 'assets/CarrilloAndrea_ZatarainHelen_Broke-Bored & Barely Alive_BackgroundMusic1.mp3.mpeg';
+    // IMPORTANTE: reemplaza esta ruta por el nombre exacto de tu segundo archivo de música.
+    const WORK_MUSIC_SRC = 'assets/CarrilloAndrea_ZatarainHelen_Broke-Bored & Barely Alive_BackgroundMusic2.mp3.mpeg';
+    let currentMusicTrack = 'default';
+
+    function switchBackgroundMusic(isWorking) {
+      const bgMusic = document.getElementById('bg-music');
+      const source = bgMusic && bgMusic.querySelector('source');
+      if (!bgMusic || !source) return;
+
+      const nextTrack = isWorking ? 'work' : 'default';
+      if (currentMusicTrack === nextTrack) return;
+
+      const wasPlaying = !bgMusic.paused;
+      source.src = isWorking ? WORK_MUSIC_SRC : DEFAULT_MUSIC_SRC;
+      bgMusic.load();
+      currentMusicTrack = nextTrack;
+
+      // Si la música ya estaba sonando, continúa con la nueva pista.
+      if (wasPlaying) {
+        bgMusic.play().catch(() => {});
+      }
+    }
 
     const dialogueText = document.getElementById('dialogue-text');
     const actionDock = document.getElementById('action-buttons-dock');
@@ -742,6 +775,7 @@
 
     function loadScene(scene) {
       state.currentScene = scene;
+      switchBackgroundMusic(scene === 'work');
       actionDock.innerHTML = '';
 
       if (scene === 'dorm') {
