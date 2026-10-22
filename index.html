@@ -55,28 +55,27 @@
     }
 
     .bg-dorm {
-      /* RUTAS DE IMÁGENES DE FONDO DE CADA ESCENARIO */
-      /* background-image: url('imagenes/fondos/casa_dormitorio.png'); */
+     background-image: url('assets/habitacion2.jpg'); 
       background-color: #1f1235;
     }
 
     .bg-commute {
-      /* background-image: url('imagenes/fondos/camino_escuela.png'); */
+     background-image: url('assets/salonclases.jpg'); 
       background-color: #ff7e5f;
     }
 
     .bg-classroom {
-      /* background-image: url('imagenes/fondos/salon_clases.png'); */
+      background-image: url('assets/salonclases.jpg');
       background-color: #0f2027;
     }
 
     .bg-cafeteria {
-      /* background-image: url('imagenes/fondos/cafeteria.png'); */
+      background-image: url('assets/cafeteria.jpg'); 
       background-color: #d31027;
     }
 
     .bg-work {
-      /* background-image: url('imagenes/fondos/trabajo.png'); */
+      background-image: url('assets/trabajo.jpg');
       background-color: #11998e;
     }
 
@@ -462,7 +461,7 @@
 
       <div class="char-select-cards">
         <div class="char-card" onclick="selectCharacter('female')">
-          <div class="char-avatar-box" id="char-select-female-img" style=" background-image: url('assets/jaiden 1.jpeg'); ">
+          <div class="char-avatar-box" id="char-select-female-img" style=" background-image: url('assets/jaidenIcon.jpeg'); ">
           </div>
           <div class="char-name">Jaiden</div>
           <p style="font-size: 12px; color: #aaa;">Female Student</p>
@@ -528,7 +527,6 @@
     <div id="character-stage">
       <div id="jaiden-sprite" class="character-sprite-placeholder">
         <div class="sprite-dummy" id="sprite-dummy-text">
-          <span>[JAIDEN 2D]</span>
         </div>
       </div>
     </div>
@@ -541,7 +539,6 @@
       </div>
       <div id="portrait-frame">
         <div id="jaiden-portrait" class="portrait-placeholder">
-          <span>[AVATAR]</span>
         </div>
       </div>
     </div>
@@ -589,22 +586,21 @@
     // DICCIONARIO DE RUTAS DE IMÁGENES
     const JAIDEN_ASSETS = {
       dorm: {
-        normal: { sprite: 'imagenes/jaiden/pijama_normal.jpeg', avatar: 'imagenes/jaiden/pijama_normal_face.png' },
-        tired:  { sprite: './assets/jaidenPimajaCansada.jpeg', avatar: './assets/jaidenPimajaCansada.jpeg' },
-        happy:  { sprite: 'imagenes/jaiden/pijama_feliz.png', avatar: 'imagenes/jaiden/pijama_feliz_face.png' },
-        panic:  { sprite: 'imagenes/jaiden/pijama_llorando.png', avatar: 'imagenes/jaiden/pijama_llorando_face.png' }
+        tired:  { sprite: './assets/JaidenPijamaTired.png', avatar: './assets/iconTiredPijama.png' },
+        happy:  { sprite: './assets/JaidenPijamaHappy.png', avatar: './assets/iconHappyPijama.png' },
+        panic:  { sprite: './assets/JaidenPijamaPanic.png', avatar: './assets/iconSadPijama.png' }
       },
       school: {
-        normal: { sprite: 'assets/jaiden', avatar: 'imagenes/jaiden/escuela_normal_face.png' },
-        tired:  { sprite: 'imagenes/jaiden/escuela_cansada.png', avatar: 'imagenes/jaiden/escuela_cansada_face.png' },
-        happy:  { sprite: 'assets/jaidenFelizEscuela.jpeg', avatar: 'assets/jaidenFelizEscuela.jpeg' },
-        study:  { sprite: 'imagenes/jaiden/escuela_estudiando.png', avatar: 'imagenes/jaiden/escuela_estudiando_face.png' },
-        panic:  { sprite: 'imagenes/jaiden/escuela_llorando.png', avatar: 'imagenes/jaiden/escuela_llorando_face.png' }
+        normal: { sprite: './assets/JaidenEscuelaNormal.png', avatar: 'imagenes/jaiden/escuela_normal_face.png' },
+        tired:  { sprite: './assets/JaidenEscuelaTired.png', avatar: 'imagenes/jaiden/escuela_cansada_face.png' },
+        happy:  { sprite: './assets/JaidenEscuelaHappy.png', avatar: 'assets/jaidenFelizEscuela.jpeg' },
+        study:  { sprite: './assets/JaidenEscuelaEstudiosa.png', avatar: 'imagenes/jaiden/escuela_estudiando_face.png' },
+        panic:  { sprite: './assets/JaidenEscuelaPanic.png', avatar: 'imagenes/jaiden/escuela_llorando_face.png' }
       },
       work: {
-        normal:  { sprite: 'imagenes/jaiden/trabajo_normal.png', avatar: 'imagenes/jaiden/trabajo_normal_face.png' },
+        normal:  { sprite: './assets/JaidenTrabajoNormal.png', avatar: 'imagenes/jaiden/trabajo_normal_face.png' },
         tired:   { sprite: 'imagenes/jaiden/trabajo_cansada.png', avatar: 'imagenes/jaiden/trabajo_cansada_face.png' },
-        working: { sprite: 'imagenes/jaiden/trabajo_trabajando.png', avatar: 'imagenes/jaiden/trabajo_trabajando_face.png' },
+        working: { sprite: './assets/JaidenTrabajoTrabajando.png', avatar: 'imagenes/jaiden/trabajo_trabajando_face.png' },
         panic:   { sprite: 'imagenes/jaiden/trabajo_llorando.png', avatar: 'imagenes/jaiden/trabajo_llorando_face.png' }
       }
     };
@@ -790,7 +786,7 @@ pruebaImagen.onerror = () => {
         setDialogue("Walking to school in my uniform... I hope today isn't a total nightmare.");
         updateCharacterAppearance('school', 'normal');
         
-        setTimeout(() => loadScene('classroom'), 3000);
+        setTimeout(() => loadScene('classroom'), 10);
 
       } else if (scene === 'classroom') {
         sceneBg.className = 'scene-bg bg-classroom';
@@ -914,12 +910,12 @@ pruebaImagen.onerror = () => {
 
       if (caughtProbability < 0.25) { // 25% de probabilidad de ser descubierta
         state.grades = 0;
-        triggerGameOver("CAUGHT CHEATING! The teacher saw you looking at your classmate's paper. F-!");
+        triggerGameOver("CAUGHT CHEATING! The teacher saw you looking at your classmate's paper!");
       } else {
         state.grades = Math.min(100, state.grades + 25);
         state.stress += 15;
         setDialogue("Phew! Copied the answers without getting caught!");
-        updateCharacterAppearance('school', 'happy');
+        updateCharacterAppearance('school', 'panic');
         updateBars();
       }
     }
