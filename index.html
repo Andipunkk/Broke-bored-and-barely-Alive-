@@ -34,9 +34,8 @@
       height: 56.25vw;
       max-height: 720px;
       background-color: #1f2833;
-      border: 4px solid #45a29e;
+      border: 4px solid #06201f;
       border-radius: 20px;
-      box-shadow: 0 0 30px rgba(102, 252, 241, 0.2);
       overflow: hidden;
     }
 
@@ -100,7 +99,7 @@
       backdrop-filter: blur(10px);
       padding: 8px 14px;
       border-radius: 16px;
-      border: 2px solid rgba(102, 252, 241, 0.3);
+      border: 2px solid rgba(12, 49, 47, 0.3);
       display: flex;
       align-items: center;
       gap: 10px;
@@ -221,23 +220,7 @@
       transition: background-image 0.2s ease;
     }
 
-    .sprite-dummy {
-      width: 220px;
-      height: 380px;
-      background: rgba(255, 255, 255, 0.1);
-      border: 3px dashed rgba(102, 252, 241, 0.5);
-      border-radius: 120px 120px 20px 20px;
-      backdrop-filter: blur(4px);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      color: #66fcf1;
-      font-family: 'Fredoka One', cursive;
-      font-size: 16px;
-      text-align: center;
-      padding: 10px;
-    }
+
 
     /* ==========================================================================
        CAJA DE DIÁLOGO Y RETRATO/AVATAR DERECHO
@@ -329,22 +312,22 @@
     .game-logo {
       font-family: 'Fredoka One', cursive;
       font-size: 46px;
-      color: #66fcf1;
-      text-shadow: 0 0 20px rgba(102, 252, 241, 0.6), 4px 4px 0px #0b0c10;
+      color: #fffb00;
+      text-shadow: 0 0 20px rgba(255, 253, 123, 0.685), 4px 4px 0px #0b0c10;
       margin-bottom: 12px;
       text-align: center;
     }
 
     .start-btn {
-      background: linear-gradient(135deg, #66fcf1, #45a29e);
-      color: #0b0c10;
+      background: linear-gradient(135deg, #e626ff, #cc02ff);
+      color: #eeeeee;
       border: none;
       padding: 16px 48px;
       font-size: 24px;
       font-family: 'Fredoka One', cursive;
       border-radius: 35px;
       cursor: pointer;
-      box-shadow: 0 8px 25px rgba(102, 252, 241, 0.4);
+      box-shadow: 0 8px 25px rgba(255, 172, 244, 0.4);
       margin-top: 25px;
     }
 
@@ -354,7 +337,7 @@
       width: 220px;
       height: 300px;
       background: rgba(31, 40, 51, 0.8);
-      border: 3px solid #45a29e;
+      border: 3px solid rgb(162, 69, 157);
       border-radius: 20px;
       padding: 20px;
       display: flex;
@@ -371,7 +354,7 @@
       width: 120px;
       height: 120px;
       border-radius: 50%;
-      border: 3px solid #66fcf1;
+      border: 3px solid #7e0f8d;
       background: rgba(11, 12, 16, 0.6);
       display: flex;
       justify-content: center;
@@ -479,8 +462,7 @@
 
       <div class="char-select-cards">
         <div class="char-card" onclick="selectCharacter('female')">
-          <div class="char-avatar-box" id="char-select-female-img" style="/* background-image: url('imagenes/jaiden_select.png'); */">
-            <span>[JAIDEN]</span>
+          <div class="char-avatar-box" id="char-select-female-img" style=" background-image: url('assets/jaiden 1.jpeg'); ">
           </div>
           <div class="char-name">Jaiden</div>
           <p style="font-size: 12px; color: #aaa;">Female Student</p>
@@ -488,8 +470,7 @@
 
         <div class="char-card disabled">
           <div class="badge-coming-soon">IN DEV</div>
-          <div class="char-avatar-box" id="char-select-male-img" style="border-color: #555; /* background-image: url('imagenes/alex_indev.png'); */">
-            <span>[ALEX - IN DEV]</span>
+          <div class="char-avatar-box" id="char-select-male-img" style="border-color: #555;  background-image: url('assets/alex\ 1.jpeg'); ">
           </div>
           <div class="char-name" style="color: #888;">Alex</div>
           <p style="font-size: 12px; color: #666;">Male Student</p>
@@ -608,15 +589,15 @@
     // DICCIONARIO DE RUTAS DE IMÁGENES
     const JAIDEN_ASSETS = {
       dorm: {
-        normal: { sprite: 'imagenes/jaiden/pijama_normal.png', avatar: 'imagenes/jaiden/pijama_normal_face.png' },
-        tired:  { sprite: 'imagenes/jaiden/pijama_cansada.png', avatar: 'imagenes/jaiden/pijama_cansada_face.png' },
+        normal: { sprite: 'imagenes/jaiden/pijama_normal.jpeg', avatar: 'imagenes/jaiden/pijama_normal_face.png' },
+        tired:  { sprite: './assets/jaidenPimajaCansada.jpeg', avatar: './assets/jaidenPimajaCansada.jpeg' },
         happy:  { sprite: 'imagenes/jaiden/pijama_feliz.png', avatar: 'imagenes/jaiden/pijama_feliz_face.png' },
         panic:  { sprite: 'imagenes/jaiden/pijama_llorando.png', avatar: 'imagenes/jaiden/pijama_llorando_face.png' }
       },
       school: {
-        normal: { sprite: 'imagenes/jaiden/escuela_normal.png', avatar: 'imagenes/jaiden/escuela_normal_face.png' },
+        normal: { sprite: 'assets/jaiden', avatar: 'imagenes/jaiden/escuela_normal_face.png' },
         tired:  { sprite: 'imagenes/jaiden/escuela_cansada.png', avatar: 'imagenes/jaiden/escuela_cansada_face.png' },
-        happy:  { sprite: 'imagenes/jaiden/escuela_feliz.png', avatar: 'imagenes/jaiden/escuela_feliz_face.png' },
+        happy:  { sprite: 'assets/jaidenFelizEscuela.jpeg', avatar: 'assets/jaidenFelizEscuela.jpeg' },
         study:  { sprite: 'imagenes/jaiden/escuela_estudiando.png', avatar: 'imagenes/jaiden/escuela_estudiando_face.png' },
         panic:  { sprite: 'imagenes/jaiden/escuela_llorando.png', avatar: 'imagenes/jaiden/escuela_llorando_face.png' }
       },
@@ -627,6 +608,22 @@
         panic:   { sprite: 'imagenes/jaiden/trabajo_llorando.png', avatar: 'imagenes/jaiden/trabajo_llorando_face.png' }
       }
     };
+
+    const img = new Image();
+img.src = './assets/jaidenPijamaCansada.jpeg';
+document.body.appendChild(img);
+
+    const pruebaImagen = new Image();
+
+pruebaImagen.src = 'assets/jaidenPijamaCansada.jpeg';
+
+pruebaImagen.onload = () => {
+  console.log('¡Imagen cargada correctamente!');
+};
+
+pruebaImagen.onerror = () => {
+  console.error('No se pudo cargar la imagen.');
+};
 
     let state = {
       energy: 70,
