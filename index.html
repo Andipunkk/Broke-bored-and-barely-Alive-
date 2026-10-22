@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Broke, Bored & Barely Alive!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ==========================================================================
+       ESTILOS GENERALES Y LIENZO DEL JUEGO (VIEWPORT 16:9)
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background-color: #0b0c10;
+      color: #ffffff;
+      font-family: 'Quicksand', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    #game-container {
+      position: relative;
+      width: 100vw;
+      max-width: 1280px;
+      height: 56.25vw;
+      max-height: 720px;
+      background-color: #1f2833;
+      border: 4px solid #45a29e;
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(102, 252, 241, 0.2);
+      overflow: hidden;
+    }
+
+    /* ==========================================================================
+       FONDOS DE ESCENARIO (RUTAS DE IMÁGENES COMENDEDAS EN ESPAÑOL)
+       ========================================================================== */
+    .scene-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      transition: filter 0.5s ease, background-image 0.5s ease;
+      z-index: 1;
+    }
+
+    .bg-dorm {
+      /* RUTAS DE IMÁGENES DE FONDO DE CADA ESCENARIO */
+      /* background-image: url('imagenes/fondos/casa_dormitorio.png'); */
+      background-color: #1f1235;
+    }
+
+    .bg-commute {
+      /* background-image: url('imagenes/fondos/camino_escuela.png'); */
+      background-color: #ff7e5f;
+    }
+
+    .bg-classroom {
+      /* background-image: url('imagenes/fondos/salon_clases.png'); */
+      background-color: #0f2027;
+    }
+
+    .bg-cafeteria {
+      /* background-image: url('imagenes/fondos/cafeteria.png'); */
+      background-color: #d31027;
+    }
+
+    .bg-work {
+      /* background-image: url('imagenes/fondos/trabajo.png'); */
+      background-color: #11998e;
+    }
+
+    /* ==========================================================================
+       BARRAS DE ESTADO (HUD SUPERIOR IZQUIERDO) CON PORCENTAJES
+       ========================================================================== */
+    #hud-bars {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 10;
+      width: 280px;
+    }
+
+    .bar-wrapper {
+      background: rgba(11, 12, 16, 0.85);
+      backdrop-filter: blur(10px);
+      padding: 8px 14px;
+      border-radius: 16px;
+      border: 2px solid rgba(102, 252, 241, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
+
+    .bar-label {
+      font-family: 'Fredoka One', cursive;
+      font-size: 13px;
+      width: 65px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .bar-container {
+      flex: 1;
+      height: 18px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      position: relative;
+    }
+
+    .bar-fill {
+      height: 100%;
+      width: 50%;
+      border-radius: 10px;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .bar-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 11px;
+      font-weight: 700;
+      color: #ffffff;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+      pointer-events: none;
+    }
+
+    .fill-energy { background: linear-gradient(90deg, #ff416c, #ff4b2b); }
+    .fill-grades { background: linear-gradient(90deg, #56ab2f, #a8e063); }
+    .fill-money  { background: linear-gradient(90deg, #f8ea8c, #f1a80a); }
+    .fill-stress { background: linear-gradient(90deg, #8a2be2, #da70d6); }
+
+    /* ==========================================================================
+       BOTONES DE ACCIÓN (DOCK SUPERIOR DERECHO)
+       ========================================================================== */
+    #action-buttons-dock {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: flex-end;
+      max-width: 360px;
+      z-index: 10;
+    }
+
+    .action-btn {
+      background: linear-gradient(135deg, rgba(31, 40, 51, 0.9), rgba(11, 12, 16, 0.9));
+      backdrop-filter: blur(10px);
+      color: #66fcf1;
+      border: 2px solid #45a29e;
+      padding: 12px 18px;
+      border-radius: 16px;
+      font-family: 'Fredoka One', cursive;
+      font-size: 15px;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .action-btn:hover {
+      background: linear-gradient(135deg, #45a29e, #1f2833);
+      color: #ffffff;
+      border-color: #66fcf1;
+      transform: translateY(-3px) scale(1.03);
+    }
+
+    .action-btn.holding {
+      background: #ff7675 !important;
+      border-color: #d63031 !important;
+      color: #fff !important;
+    }
+
+    /* ==========================================================================
+       SPRITE DE CUERPO COMPLETO EN EL CENTRO
+       ========================================================================== */
+    #character-stage {
+      position: absolute;
+      bottom: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 340px;
+      height: 480px;
+      z-index: 3;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      pointer-events: none;
+    }
+
+    .character-sprite-placeholder {
+      width: 100%;
+      height: 100%;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: bottom center;
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6));
+      transition: background-image 0.2s ease;
+    }
+
+    .sprite-dummy {
+      width: 220px;
+      height: 380px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 3px dashed rgba(102, 252, 241, 0.5);
+      border-radius: 120px 120px 20px 20px;
+      backdrop-filter: blur(4px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #66fcf1;
+      font-family: 'Fredoka One', cursive;
+      font-size: 16px;
+      text-align: center;
+      padding: 10px;
+    }
+
+    /* ==========================================================================
+       CAJA DE DIÁLOGO Y RETRATO/AVATAR DERECHO
+       ========================================================================== */
+    #dialogue-box-container {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 40px);
+      max-width: 1100px;
+      height: 130px;
+      background: rgba(11, 12, 16, 0.92);
+      backdrop-filter: blur(14px);
+      border: 3px solid #45a29e;
+      border-radius: 20px;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    }
+
+    #dialogue-content {
+      flex: 1;
+      padding-right: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    #speaker-name {
+      font-family: 'Fredoka One', cursive;
+      font-size: 22px;
+      color: #66fcf1;
+      margin-bottom: 6px;
+    }
+
+    #dialogue-text {
+      font-size: 16px;
+      line-height: 1.4;
+      color: #c5c6c7;
+      height: 50px;
+    }
+
+    #portrait-frame {
+      width: 95px;
+      height: 95px;
+      border-radius: 18px;
+      border: 3px solid #66fcf1;
+      background: rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .portrait-placeholder {
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 10px;
+      color: #45a29e;
+      font-weight: bold;
+      text-align: center;
+      transition: background-image 0.2s ease;
+    }
+
+    /* ==========================================================================
+       PANTALLAS DE MENÚ, SELECCIÓN DE PERSONAJE Y GAME OVER
+       ========================================================================== */
+    .overlay-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0b0c10, #1f2833);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .game-logo {
+      font-family: 'Fredoka One', cursive;
+      font-size: 46px;
+      color: #66fcf1;
+      text-shadow: 0 0 20px rgba(102, 252, 241, 0.6), 4px 4px 0px #0b0c10;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .start-btn {
+      background: linear-gradient(135deg, #66fcf1, #45a29e);
+      color: #0b0c10;
+      border: none;
+      padding: 16px 48px;
+      font-size: 24px;
+      font-family: 'Fredoka One', cursive;
+      border-radius: 35px;
+      cursor: pointer;
+      box-shadow: 0 8px 25px rgba(102, 252, 241, 0.4);
+      margin-top: 25px;
+    }
+
+    .char-select-cards { display: flex; gap: 30px; margin-top: 25px; }
+
+    .char-card {
+      width: 220px;
+      height: 300px;
+      background: rgba(31, 40, 51, 0.8);
+      border: 3px solid #45a29e;
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .char-card.disabled { opacity: 0.6; cursor: not-allowed; border-color: #555; }
+
+    .char-avatar-box {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid #66fcf1;
+      background: rgba(11, 12, 16, 0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 11px;
+      color: #aaa;
+      text-align: center;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .char-name { font-family: 'Fredoka One', cursive; font-size: 22px; color: #66fcf1; }
+
+    .badge-coming-soon {
+      position: absolute;
+      top: 15px;
+      right: -30px;
+      background: #ff7675;
+      color: #fff;
+      font-size: 10px;
+      font-weight: bold;
+      padding: 4px 30px;
+      transform: rotate(45deg);
+    }
+
+    /* PANTALLA DE GAME OVER */
+    #game-over-screen {
+      background: rgba(11, 12, 16, 0.95);
+      border: 4px solid #ff7675;
+    }
+
+    .game-over-title {
+      font-family: 'Fredoka One', cursive;
+      font-size: 54px;
+      color: #ff7675;
+      text-shadow: 0 0 20px rgba(255, 118, 117, 0.6);
+      margin-bottom: 10px;
+    }
+
+    /* ==========================================================================
+       MODALES DE MINIJUEGOS
+       ========================================================================== */
+    .minigame-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(11, 12, 16, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .minigame-card {
+      background: #1f2833;
+      border: 3px solid #66fcf1;
+      border-radius: 24px;
+      padding: 28px;
+      width: 440px;
+      text-align: center;
+    }
+
+    .minigame-card h3 { font-family: 'Fredoka One', cursive; color: #66fcf1; margin-bottom: 12px; font-size: 24px; }
+    .slide-track { width: 100%; height: 54px; background: #0b0c10; border-radius: 27px; position: relative; margin: 20px 0; border: 2px solid #45a29e; overflow: hidden; }
+    .slide-handle { width: 54px; height: 54px; background: #66fcf1; color: #0b0c10; border-radius: 50%; position: absolute; top: 0; left: 0; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 22px; font-weight: bold; }
+    .study-input { width: 100%; padding: 14px; font-size: 20px; border-radius: 12px; border: 2px solid #45a29e; background: #0b0c10; color: #66fcf1; text-align: center; font-family: 'Fredoka One', cursive; margin: 18px 0; outline: none; }
+    .drag-area { display: flex; justify-content: space-around; align-items: center; margin: 20px 0; }
+    .snack-item { width: 70px; height: 70px; background: #fffa65; color: #000; border-radius: 16px; display: flex; justify-content: center; align-items: center; font-size: 30px; cursor: grab; }
+    .backpack-dropzone { width: 100px; height: 100px; border: 3px dashed #66fcf1; border-radius: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 13px; color: #66fcf1; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <!-- ELEMENTOS DE AUDIO (REEMPLAZAR CON TUS ARCHIVOS MP3) -->
+  <audio id="bg-music" loop>
+    <source src="audio/musica_fondo.mp3" type="audio/mpeg">
+  </audio>
+
+  <audio id="sfx-click">
+    <source src="audio/sonido_boton.mp3" type="audio/mpeg">
+  </audio>
+
+  <div id="game-container">
+
+    <!-- 0. PANTALLA DE INICIO -->
+    <div id="title-screen" class="overlay-screen">
+      <div class="game-logo">Broke, Bored & Barely Alive!</div>
+      <p style="color: #c5c6c7; font-weight: 600; font-size: 18px;">Student Life Survival RPG</p>
+      <button class="start-btn" onclick="showCharacterSelect()">START GAME</button>
+    </div>
+
+    <!-- 0.5. SELECCIÓN DE PERSONAJE -->
+    <div id="select-screen" class="overlay-screen" style="display: none;">
+      <h2 style="font-family: 'Fredoka One', cursive; font-size: 32px; color: #66fcf1; margin-bottom: 8px;">Select Your Student</h2>
+      <p style="color: #c5c6c7;">Choose who will survive this week!</p>
+
+      <div class="char-select-cards">
+        <div class="char-card" onclick="selectCharacter('female')">
+          <div class="char-avatar-box" id="char-select-female-img" style="/* background-image: url('imagenes/jaiden_select.png'); */">
+            <span>[JAIDEN]</span>
+          </div>
+          <div class="char-name">Jaiden</div>
+          <p style="font-size: 12px; color: #aaa;">Female Student</p>
+        </div>
+
+        <div class="char-card disabled">
+          <div class="badge-coming-soon">IN DEV</div>
+          <div class="char-avatar-box" id="char-select-male-img" style="border-color: #555; /* background-image: url('imagenes/alex_indev.png'); */">
+            <span>[ALEX - IN DEV]</span>
+          </div>
+          <div class="char-name" style="color: #888;">Alex</div>
+          <p style="font-size: 12px; color: #666;">Male Student</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANTALLA DE GAME OVER -->
+    <div id="game-over-screen" class="overlay-screen" style="display: none;">
+      <div class="game-over-title">GAME OVER</div>
+      <p id="game-over-reason" style="color: #ff7675; font-size: 20px; font-weight: bold; margin-bottom: 10px; text-align: center; padding: 0 20px;"></p>
+      <p style="color: #c5c6c7;">You couldn't survive the academic week!</p>
+      <button class="start-btn" style="background: linear-gradient(135deg, #ff7675, #d63031); color: #fff;" onclick="restartGame()">TRY AGAIN</button>
+    </div>
+
+    <!-- 1. FONDO DE ESCENARIO -->
+    <div id="scene-bg" class="scene-bg bg-dorm"></div>
+
+    <!-- 2. BARRAS DE ESTADO -->
+    <div id="hud-bars">
+      <div class="bar-wrapper">
+        <span class="bar-label" style="color:#ff416c;">Energy</span>
+        <div class="bar-container">
+          <div id="bar-energy" class="bar-fill fill-energy" style="width: 70%;"></div>
+          <span id="text-energy" class="bar-text">70%</span>
+        </div>
+      </div>
+      <div class="bar-wrapper">
+        <span class="bar-label" style="color:#a8e063;">Grades</span>
+        <div class="bar-container">
+          <div id="bar-grades" class="bar-fill fill-grades" style="width: 60%;"></div>
+          <span id="text-grades" class="bar-text">60%</span>
+        </div>
+      </div>
+      <div class="bar-wrapper">
+        <span class="bar-label" style="color:#f1a80a;">Money</span>
+        <div class="bar-container">
+          <div id="bar-money" class="bar-fill fill-money" style="width: 40%;"></div>
+          <span id="text-money" class="bar-text">$40</span>
+        </div>
+      </div>
+      <div class="bar-wrapper">
+        <span class="bar-label" style="color:#da70d6;">Stress</span>
+        <div class="bar-container">
+          <div id="bar-stress" class="bar-fill fill-stress" style="width: 30%;"></div>
+          <span id="text-stress" class="bar-text">30%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. BOTONES DE ACCIÓN -->
+    <div id="action-buttons-dock"></div>
+
+    <!-- 4. SPRITE EN EL CENTRO -->
+    <div id="character-stage">
+      <div id="jaiden-sprite" class="character-sprite-placeholder">
+        <div class="sprite-dummy" id="sprite-dummy-text">
+          <span>[JAIDEN 2D]</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. CAJA DE DIÁLOGO Y AVATAR DERECHO -->
+    <div id="dialogue-box-container">
+      <div id="dialogue-content">
+        <div id="speaker-name">Jaiden</div>
+        <div id="dialogue-text">Ugh! I'm so sleepy... I really need to wake up before I miss class!</div>
+      </div>
+      <div id="portrait-frame">
+        <div id="jaiden-portrait" class="portrait-placeholder">
+          <span>[AVATAR]</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MINIJUEGOS -->
+    <div id="modal-slide" class="minigame-overlay">
+      <div class="minigame-card">
+        <h3 id="slide-title">Slide "Wake up"</h3>
+        <p id="slide-desc" style="color:#c5c6c7; font-size:15px;">Slide your finger across to open your eyes!</p>
+        <div class="slide-track" id="slide-track">
+          <div class="slide-handle" id="slide-handle">👁️</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal-study" class="minigame-overlay">
+      <div class="minigame-card">
+        <h3>Write "STUDY"</h3>
+        <p style="color:#c5c6c7; font-size:15px;">Type "STUDY" in uppercase to improve your grades!</p>
+        <input type="text" id="study-input" class="study-input" placeholder="TYPE HERE..." autocomplete="off">
+      </div>
+    </div>
+
+    <div id="modal-food" class="minigame-overlay">
+      <div class="minigame-card">
+        <h3>Hide Food</h3>
+        <p style="color:#c5c6c7; font-size:15px;">Drag your snack into your backpack before someone steals it!</p>
+        <div class="drag-area">
+          <div class="snack-item" id="drag-snack" draggable="true">🍕</div>
+          <div class="backpack-dropzone" id="drop-backpack">
+            <span style="font-size: 28px;">🎒</span>
+            <span>Backpack</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // DICCIONARIO DE RUTAS DE IMÁGENES
+    const JAIDEN_ASSETS = {
+      dorm: {
+        normal: { sprite: 'imagenes/jaiden/pijama_normal.png', avatar: 'imagenes/jaiden/pijama_normal_face.png' },
+        tired:  { sprite: 'imagenes/jaiden/pijama_cansada.png', avatar: 'imagenes/jaiden/pijama_cansada_face.png' },
+        happy:  { sprite: 'imagenes/jaiden/pijama_feliz.png', avatar: 'imagenes/jaiden/pijama_feliz_face.png' },
+        panic:  { sprite: 'imagenes/jaiden/pijama_llorando.png', avatar: 'imagenes/jaiden/pijama_llorando_face.png' }
+      },
+      school: {
+        normal: { sprite: 'imagenes/jaiden/escuela_normal.png', avatar: 'imagenes/jaiden/escuela_normal_face.png' },
+        tired:  { sprite: 'imagenes/jaiden/escuela_cansada.png', avatar: 'imagenes/jaiden/escuela_cansada_face.png' },
+        happy:  { sprite: 'imagenes/jaiden/escuela_feliz.png', avatar: 'imagenes/jaiden/escuela_feliz_face.png' },
+        study:  { sprite: 'imagenes/jaiden/escuela_estudiando.png', avatar: 'imagenes/jaiden/escuela_estudiando_face.png' },
+        panic:  { sprite: 'imagenes/jaiden/escuela_llorando.png', avatar: 'imagenes/jaiden/escuela_llorando_face.png' }
+      },
+      work: {
+        normal:  { sprite: 'imagenes/jaiden/trabajo_normal.png', avatar: 'imagenes/jaiden/trabajo_normal_face.png' },
+        tired:   { sprite: 'imagenes/jaiden/trabajo_cansada.png', avatar: 'imagenes/jaiden/trabajo_cansada_face.png' },
+        working: { sprite: 'imagenes/jaiden/trabajo_trabajando.png', avatar: 'imagenes/jaiden/trabajo_trabajando_face.png' },
+        panic:   { sprite: 'imagenes/jaiden/trabajo_llorando.png', avatar: 'imagenes/jaiden/trabajo_llorando_face.png' }
+      }
+    };
+
+    let state = {
+      energy: 70,
+      grades: 60,
+      money: 40,
+      stress: 30,
+      currentScene: 'dorm',
+      selectedCharacter: 'female',
+      isGameOver: false
+    };
+
+    const dialogueText = document.getElementById('dialogue-text');
+    const actionDock = document.getElementById('action-buttons-dock');
+    const sceneBg = document.getElementById('scene-bg');
+    const spriteElem = document.getElementById('jaiden-sprite');
+    const portraitElem = document.getElementById('jaiden-portrait');
+    const spriteDummyText = document.getElementById('sprite-dummy-text');
+
+    function playClickSFX() {
+      const sfx = document.getElementById('sfx-click');
+      if (sfx) {
+        sfx.currentTime = 0;
+        sfx.play().catch(() => {});
+      }
+    }
+
+    function updateCharacterAppearance(outfitCategory, emotion) {
+      const assets = JAIDEN_ASSETS[outfitCategory] && JAIDEN_ASSETS[outfitCategory][emotion];
+      if (assets) {
+        spriteElem.style.backgroundImage = `url('${assets.sprite}')`;
+        portraitElem.style.backgroundImage = `url('${assets.avatar}')`;
+      }
+
+      if (spriteDummyText) {
+        spriteDummyText.innerHTML = `
+          <span>[JAIDEN 2D]</span>
+          <span style="font-size: 11px; margin-top: 6px; color: #66fcf1;">
+            Lugar: ${outfitCategory.toUpperCase()}<br>
+            Emoción: ${emotion.toUpperCase()}
+          </span>
+        `;
+      }
+    }
+
+    // VERIFICADOR Y EVALUADOR DE PÉRDIDA / GAME OVER
+    function updateBars() {
+      if (state.isGameOver) return;
+
+      state.energy = Math.max(0, Math.min(100, state.energy));
+      state.grades = Math.max(0, Math.min(100, state.grades));
+      state.money = Math.max(0, Math.min(500, state.money));
+      state.stress = Math.max(0, Math.min(100, state.stress));
+
+      document.getElementById('bar-energy').style.width = state.energy + '%';
+      document.getElementById('text-energy').innerText = Math.round(state.energy) + '%';
+
+      document.getElementById('bar-grades').style.width = state.grades + '%';
+      document.getElementById('text-grades').innerText = Math.round(state.grades) + '%';
+
+      document.getElementById('bar-money').style.width = Math.min(100, (state.money / 200) * 100) + '%';
+      document.getElementById('text-money').innerText = '$' + Math.round(state.money);
+
+      document.getElementById('bar-stress').style.width = state.stress + '%';
+      document.getElementById('text-stress').innerText = Math.round(state.stress) + '%';
+
+      // EVALUAR CONDICIONES DE DERROTA
+      if (state.grades <= 0) {
+        triggerGameOver("Academic Expulsion! Your grades dropped to 0%.");
+      } else if (state.money <= 0) {
+        triggerGameOver("Bankrupt! You ran completely out of money.");
+      } else if (state.stress >= 100) {
+        triggerGameOver("Mental Breakdown! Your stress reached maximum capacity.");
+      } else if (state.energy <= 0) {
+        triggerGameOver("Total Collapse! You passed out from extreme exhaustion.");
+      }
+    }
+
+    function triggerGameOver(reason) {
+      state.isGameOver = true;
+      document.getElementById('game-over-reason').innerText = reason;
+      document.getElementById('game-over-screen').style.display = 'flex';
+      updateCharacterAppearance('school', 'panic');
+    }
+
+    function restartGame() {
+      state = {
+        energy: 70,
+        grades: 60,
+        money: 40,
+        stress: 30,
+        currentScene: 'dorm',
+        selectedCharacter: 'female',
+        isGameOver: false
+      };
+      document.getElementById('game-over-screen').style.display = 'none';
+      loadScene('dorm');
+    }
+
+    function setDialogue(text) {
+      dialogueText.innerText = text;
+    }
+
+    function showCharacterSelect() {
+      const bgMusic = document.getElementById('bg-music');
+      if (bgMusic) {
+        bgMusic.volume = 0.4;
+        bgMusic.play().catch(() => {});
+      }
+      playClickSFX();
+      document.getElementById('title-screen').style.display = 'none';
+      document.getElementById('select-screen').style.display = 'flex';
+    }
+
+    function selectCharacter(gender) {
+      playClickSFX();
+      if (gender === 'female') {
+        state.selectedCharacter = 'female';
+        document.getElementById('select-screen').style.display = 'none';
+        loadScene('dorm');
+      }
+    }
+
+    function loadScene(scene) {
+      state.currentScene = scene;
+      actionDock.innerHTML = '';
+
+      if (scene === 'dorm') {
+        sceneBg.className = 'scene-bg bg-dorm';
+        setDialogue("Ugh! I'm so sleepy... I really need to wake up and get ready for school.");
+        updateCharacterAppearance('dorm', 'tired');
+        
+        createActionButton("👁️ Wake up", () => openSlideModal("Wake up", "Slide to open your eyes!", completeWakeUp));
+        createActionButton("☕ Drink coffee", handleDoubleCoffee);
+        createActionButton("💃 Dance", handleDance);
+        createActionButton("😭 Cry out loud", handleCry);
+
+      } else if (scene === 'commute') {
+        sceneBg.className = 'scene-bg bg-commute';
+        setDialogue("Walking to school in my uniform... I hope today isn't a total nightmare.");
+        updateCharacterAppearance('school', 'normal');
+        
+        setTimeout(() => loadScene('classroom'), 3000);
+
+      } else if (scene === 'classroom') {
+        sceneBg.className = 'scene-bg bg-classroom';
+        setDialogue("Arrived at class. Oh no... there's a high chance of a surprise exam today!");
+        updateCharacterAppearance('school', 'normal');
+
+        createActionButton("📖 Study", openStudyModal);
+        createActionButton("👀 Cheat on exam", () => openSlideModal("Cheat on exam", "Slide eyes to classmate's paper!", completeCheat));
+        createActionButton("😴 Nap in class", handleNap);
+        createActionButton("🥪 Lunchtime ->", () => loadScene('cafeteria'));
+
+      } else if (scene === 'cafeteria') {
+        sceneBg.className = 'scene-bg bg-cafeteria';
+        setDialogue("Cafeteria time! I'm starving, but I need to balance my money.");
+        updateCharacterAppearance('school', 'happy');
+
+        createActionButton("🍲 Eat buffet", handleEatBuffet);
+        createActionButton("🎒 Hide food", openHideFoodModal);
+        createActionButton("💼 Go to Work ->", () => loadScene('work'));
+
+      } else if (scene === 'work') {
+        sceneBg.className = 'scene-bg bg-work';
+        setDialogue("Changed into my job uniform. Time for my part-time shift! Press and HOLD the button.");
+        updateCharacterAppearance('work', 'normal');
+
+        createHoldActionButton("⏱️ Hold Work", startWorking, stopWorking);
+        createActionButton("🏠 Go Home", () => loadScene('dorm'));
+      }
+
+      updateBars();
+    }
+
+    function createActionButton(label, onClick) {
+      const btn = document.createElement('button');
+      btn.className = 'action-btn';
+      btn.innerText = label;
+      btn.onclick = (e) => {
+        playClickSFX();
+        onClick(e);
+      };
+      actionDock.appendChild(btn);
+      return btn;
+    }
+
+    function createHoldActionButton(label, onHoldStart, onHoldEnd) {
+      const btn = document.createElement('button');
+      btn.className = 'action-btn';
+      btn.innerText = label;
+
+      const start = (e) => {
+        e.preventDefault();
+        playClickSFX();
+        btn.classList.add('holding');
+        onHoldStart();
+      };
+
+      const end = (e) => {
+        e.preventDefault();
+        btn.classList.remove('holding');
+        onHoldEnd();
+      };
+
+      btn.addEventListener('mousedown', start);
+      btn.addEventListener('mouseup', end);
+      btn.addEventListener('mouseleave', end);
+      btn.addEventListener('touchstart', start);
+      btn.addEventListener('touchend', end);
+
+      actionDock.appendChild(btn);
+      return btn;
+    }
+
+    /* MINIJUEGOS Y MECÁNICAS */
+    let sliderCallback = null;
+    function openSlideModal(title, desc, callback) {
+      document.getElementById('slide-title').innerText = title;
+      document.getElementById('slide-desc').innerText = desc;
+      document.getElementById('modal-slide').style.display = 'flex';
+      sliderCallback = callback;
+      resetSlider();
+    }
+
+    const handle = document.getElementById('slide-handle');
+    const track = document.getElementById('slide-track');
+    let isDragging = false;
+
+    handle.addEventListener('mousedown', () => isDragging = true);
+    window.addEventListener('mouseup', () => {
+      if (!isDragging) return;
+      isDragging = false;
+      if (parseInt(handle.style.left) > 220) {
+        document.getElementById('modal-slide').style.display = 'none';
+        if (sliderCallback) sliderCallback();
+      } else {
+        handle.style.left = '0px';
+      }
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const rect = track.getBoundingClientRect();
+      let offsetX = e.clientX - rect.left - 27;
+      if (offsetX < 0) offsetX = 0;
+      if (offsetX > rect.width - 54) offsetX = rect.width - 54;
+      handle.style.left = offsetX + 'px';
+    });
+
+    function resetSlider() { handle.style.left = '0px'; }
+
+    function completeWakeUp() {
+      state.energy = Math.min(100, state.energy + 25);
+      setDialogue("Fully awake now! Time to put on my uniform and head to school.");
+      updateCharacterAppearance('dorm', 'happy');
+      updateBars();
+      setTimeout(() => loadScene('commute'), 1200);
+    }
+
+    // COPIAR EN EXAMEN CON PROBABILIDAD DE QUE LA PROFESORA TE CACHE (25%)
+    function completeCheat() {
+      const caughtProbability = Math.random(); // Genera número entre 0 y 1
+
+      if (caughtProbability < 0.25) { // 25% de probabilidad de ser descubierta
+        state.grades = 0;
+        triggerGameOver("CAUGHT CHEATING! The teacher saw you looking at your classmate's paper. F-!");
+      } else {
+        state.grades = Math.min(100, state.grades + 25);
+        state.stress += 15;
+        setDialogue("Phew! Copied the answers without getting caught!");
+        updateCharacterAppearance('school', 'happy');
+        updateBars();
+      }
+    }
+
+    let coffeeClicks = 0;
+    let coffeeTimer = null;
+    function handleDoubleCoffee() {
+      coffeeClicks++;
+      if (coffeeClicks === 1) {
+        coffeeTimer = setTimeout(() => { coffeeClicks = 0; }, 400);
+      } else if (coffeeClicks === 2) {
+        clearTimeout(coffeeTimer);
+        coffeeClicks = 0;
+        state.energy = Math.min(100, state.energy + 30);
+        state.stress += 10;
+        setDialogue("Gulp! Double espresso shot down. Energy boosted!");
+        updateCharacterAppearance(state.currentScene === 'dorm' ? 'dorm' : 'school', 'happy');
+        updateBars();
+      }
+    }
+
+    let danceClicks = 0;
+    function handleDance() {
+      danceClicks++;
+      if (state.stress > 0) state.stress = Math.max(0, state.stress - 2);
+      setDialogue(`Dancing like crazy! Stress level dropping! (${danceClicks} moves)`);
+      updateCharacterAppearance('dorm', 'happy');
+      updateBars();
+    }
+
+    let cryClicks = 0;
+    let cryTimer = null;
+    function handleCry() {
+      cryClicks++;
+      clearTimeout(cryTimer);
+
+      const category = state.currentScene === 'dorm' ? 'dorm' : (state.currentScene === 'work' ? 'work' : 'school');
+      updateCharacterAppearance(category, 'panic');
+
+      if (cryClicks < 5) {
+        setDialogue(`Keep clicking to vent! (${cryClicks}/5 clicks needed)`);
+        cryTimer = setTimeout(() => { cryClicks = 0; }, 1200);
+      } else {
+        cryClicks = 0;
+        state.stress = Math.max(0, state.stress - 25);
+        setDialogue("Waaaaah! Let it all out! Crying relieved a lot of academic stress!");
+        updateBars();
+      }
+    }
+
+    function openStudyModal() {
+      const modal = document.getElementById('modal-study');
+      const input = document.getElementById('study-input');
+      input.value = '';
+      modal.style.display = 'flex';
+      input.focus();
+
+      input.oninput = () => {
+        if (input.value.trim().toUpperCase() === 'STUDY') {
+          modal.style.display = 'none';
+          state.grades = Math.min(100, state.grades + 20);
+          state.energy = Math.max(0, state.energy - 10);
+          setDialogue("Study session complete! Grades improved.");
+          updateCharacterAppearance('school', 'study');
+          updateBars();
+        }
+      };
+    }
+
+    let napClicks = 0;
+    let napTimer = null;
+    function handleNap() {
+      napClicks++;
+      if (napClicks === 1) {
+        napTimer = setTimeout(() => { napClicks = 0; }, 400);
+      } else if (napClicks === 2) {
+        clearTimeout(napTimer);
+        napClicks = 0;
+        state.energy = Math.min(100, state.energy + 15);
+        state.grades = Math.max(0, state.grades - 5);
+        setDialogue("Took a quick power nap on the desk while teacher looked away.");
+        updateCharacterAppearance('school', 'tired');
+        updateBars();
+      }
+    }
+
+    function handleEatBuffet() {
+      if (state.money >= 10) {
+        state.money -= 10;
+        state.energy = Math.min(100, state.energy + 35);
+        setDialogue("A full meal! Stamina restored.");
+        updateCharacterAppearance('school', 'happy');
+      } else {
+        setDialogue("Not enough money for the buffet! Need to work.");
+        updateCharacterAppearance('school', 'tired');
+      }
+      updateBars();
+    }
+
+    function openHideFoodModal() {
+      const modal = document.getElementById('modal-food');
+      modal.style.display = 'flex';
+      const snack = document.getElementById('drag-snack');
+      const backpack = document.getElementById('drop-backpack');
+
+      snack.ondragstart = (e) => {
+        e.dataTransfer.setData('text/plain', 'snack');
+      };
+
+      backpack.ondragover = (e) => e.preventDefault();
+      backpack.ondrop = (e) => {
+        e.preventDefault();
+        modal.style.display = 'none';
+        state.energy = Math.min(100, state.energy + 10);
+        setDialogue("Snack safely hidden in backpack for later!");
+        updateCharacterAppearance('school', 'happy');
+        updateBars();
+      };
+    }
+
+    let workInterval = null;
+    function startWorking() {
+      setDialogue("Working shift in progress... Keep holding!");
+      updateCharacterAppearance('work', 'working');
+      workInterval = setInterval(() => {
+        if (state.energy > 5) {
+          state.money += 2;
+          state.energy -= 1;
+          state.stress += 0.5;
+          updateBars();
+        } else {
+          stopWorking();
+          setDialogue("Too exhausted to work more! Need rest or food.");
+          updateCharacterAppearance('work', 'tired');
+        }
+      }, 200);
+    }
+
+    function stopWorking() {
+      if (workInterval) {
+        clearInterval(workInterval);
+        workInterval = null;
+        setDialogue("Shift paused. Earned money while working!");
+        updateCharacterAppearance('work', 'normal');
+      }
+    }
+  </script>
+</body>
+</html>
